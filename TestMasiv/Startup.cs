@@ -9,6 +9,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TestMasiv.Interface;
+using TestMasiv.Services;
 namespace TestMasiv
 {
     public class Startup
@@ -38,6 +40,7 @@ namespace TestMasiv
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             });
+            services.AddSingleton<IRouletteServices, RouletteServices>();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
