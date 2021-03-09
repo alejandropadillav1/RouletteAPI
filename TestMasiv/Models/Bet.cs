@@ -5,7 +5,7 @@ namespace TestMasiv.Models
 {
     public class Bet
     {
-        [Range(0, 38)]
+        [Range(-1, 38)]
         public int Position { get; set; }
         public ColorEnum Color { get; set; }
         [Range(0.1d, maximum: 10000)]

@@ -6,7 +6,7 @@ namespace TestMasiv.Models
     public class BetUsers
     {
         public int Id { get; set; }
-        public double Value { get; set; }
-        public List<Bet> Bets { get; set; }
+        public double WinMoney { get; set; }
+        public List<Bet> Bets { get; set; } = new List<Bet>();
     }
 }

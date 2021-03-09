@@ -27,5 +27,22 @@ namespace TestMasiv.Controller
                 yield return roulette;
             }
         }
+        [HttpPut]
+        public async Task<IActionResult> OpenRouletteAsync(string Id)
+        {
+            var status = await _rouletteServices.OpenRoulette(Id);
+            return Ok(status);
+        }
+        [HttpPut]
+        public async IAsyncEnumerable<BetUsers> CloseRouletteAsync(string Id)
+        {
+            await foreach(var roulette in _rouletteServices.CloseRoulette(Id))
+            {
+                yield return roulette;
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> BetRouletteAsync(int IdUser, string Id, Bet betRequest)
+        { return Ok(await _rouletteServices.BetRoulette(IdUser, Id, betRequest)); }
     }
 }
