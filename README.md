@@ -24,7 +24,7 @@ pares son rojos y los impares son negros.
     
     
 ## Installation Instructions
-- Visual Studio, make sure you set the startup project into docker-compose.
+- Visual Studio 2019, make sure you set the startup project into docker-compose.
 - And start the project, it should launch the web page redirected to Swagger
     
 
