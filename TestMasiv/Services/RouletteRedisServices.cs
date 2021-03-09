@@ -12,8 +12,14 @@ namespace TestMasiv.Services
     public class RouletteRedisServices : IRouletteServices
     {
         private readonly IDistributedCache _cache;
-        private readonly string RecordKey = "TABLEROULETTE";
-        public RouletteRedisServices(IDistributedCache cache) { _cache = cache; }
+        private string RecordKey = "TABLEROULETTE";
+        private List<Roulette> listRoulette;
+        public RouletteRedisServices(IDistributedCache cache)
+        {
+            _cache = cache;
+            RecordKey = string.Format("{0}-{1}", RecordKey, DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ssZ"));
+            listRoulette = new List<Roulette>();
+        }
         public Task<bool> BetRoulette(int IdUser, int idRoulette, Bet betRequest, CancellationTokenSource token = null)
         { throw new NotImplementedException(); }
         public IAsyncEnumerable<BetUsers> CloseRoulette(int Id) { throw new NotImplementedException(); }
@@ -26,11 +32,18 @@ namespace TestMasiv.Services
                 OpenAt = null,
                 ClosedAt = null
             };
-            await _cache.SetRecordAsync<Roulette>(RecordKey, roulette);
+            listRoulette.Add(roulette);
+            await _cache.SetRecordAsync(RecordKey, listRoulette);
             return await Task.FromResult(roulette.Id);
         }
-        public IAsyncEnumerable<Roulette> GetAllRouletteAsync(CancellationTokenSource token = null)
-        { throw new NotImplementedException(); }
+        public async IAsyncEnumerable<Roulette> GetAllRouletteAsync(CancellationTokenSource token = null)
+        {
+            listRoulette = await _cache.GetRecordAsync<List<Roulette>>(RecordKey);
+            foreach(var roulette in listRoulette)
+            {
+                yield return roulette;
+            }
+        }
         public Task<bool> OpenRoulette(int Id, CancellationTokenSource token = null)
         { throw new NotImplementedException(); }
     }
