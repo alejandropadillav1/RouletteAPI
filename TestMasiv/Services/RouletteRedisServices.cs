@@ -20,21 +20,68 @@ namespace TestMasiv.Services
             RecordKey = string.Format("{0}-{1}", RecordKey, DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ssZ"));
             listRoulette = new List<Roulette>();
         }
-        public Task<bool> BetRoulette(int IdUser, int idRoulette, Bet betRequest, CancellationTokenSource token = null)
+        public Task<bool> BetRoulette(int IdUser, string idRoulette, Bet betRequest, CancellationTokenSource token = null)
         { throw new NotImplementedException(); }
-        public IAsyncEnumerable<BetUsers> CloseRoulette(int Id) { throw new NotImplementedException(); }
+        public async IAsyncEnumerable<BetUsers> CloseRoulette(string Id)
+        {
+            var roulette = listRoulette.FirstOrDefault(x => x.Id.Equals(Id));
+            if(roulette == null)
+            {
+                throw new Exception("Roulette Not Found");
+            }
+            if(roulette.IsOpen)
+            {
+                if(!roulette.IsClosed)
+                {
+                    roulette.ClosedAt = DateTime.Now;
+                    CalculatePrize(roulette);
+                    await SaveChangesAsync(listRoulette);
+                    foreach(var betUser in roulette.ListUsers)
+                    {
+                        yield return betUser;
+                    }
+                }
+                else
+                {
+                    foreach(var betUser in roulette.ListUsers)
+                    {
+                        yield return betUser;
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Roulette is not opened, please open first before close");
+            }
+        }
+        private void CalculatePrize(Roulette roulette)
+        {
+            var winNumber = new Random().Next(0, 36);
+            var winColor = winNumber % 2 == 0 ? ColorEnum.Red : ColorEnum.Black;
+            foreach(var betUser in roulette.ListUsers)
+            {
+                var sumPrize = 0d;
+                foreach(var bet in betUser.Bets)
+                {
+                    if(bet.Position == winNumber)
+                        sumPrize += bet.BetValue * 5;
+                    if(bet.Position == -1 && bet.Color == winColor)
+                        sumPrize += bet.BetValue * 1.8;
+                }
+                betUser.WinMoney = sumPrize;
+            }
+        }
         public async Task<string> CreateRoulette(CancellationTokenSource token = null)
         {
             Roulette roulette = new Roulette
             {
                 Id = Guid.NewGuid().ToString(),
-                IsOpen = false,
                 OpenAt = null,
                 ClosedAt = null
             };
             listRoulette.Add(roulette);
-            await _cache.SetRecordAsync(RecordKey, listRoulette);
-            return await Task.FromResult(roulette.Id);
+            await SaveChangesAsync(listRoulette);
+            return roulette.Id;
         }
         public async IAsyncEnumerable<Roulette> GetAllRouletteAsync(CancellationTokenSource token = null)
         {
@@ -44,7 +91,28 @@ namespace TestMasiv.Services
                 yield return roulette;
             }
         }
-        public Task<bool> OpenRoulette(int Id, CancellationTokenSource token = null)
-        { throw new NotImplementedException(); }
+        public async Task<bool> OpenRoulette(string Id, CancellationTokenSource token = null)
+        {
+            var roulette = listRoulette.FirstOrDefault(x => x.Id.Equals(Id));
+            if(roulette == null)
+            {
+                throw new Exception("Roulette Not Found");
+            }
+            if(!roulette.IsOpen)
+            {
+                roulette.OpenAt = DateTime.Now;
+                await SaveChangesAsync(listRoulette);
+                return true;
+            }
+            if(roulette.IsClosed)
+            {
+                throw new Exception("Roulette has been closed");
+            }
+            else
+            {
+                throw new Exception("Roulette is open");
+            }
+        }
+        private async Task SaveChangesAsync<T>(List<T> list) { await _cache.SetRecordAsync(RecordKey, list); }
     }
 }
