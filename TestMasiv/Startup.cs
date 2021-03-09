@@ -40,7 +40,7 @@ namespace TestMasiv
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             });
-            services.AddSingleton<IRouletteServices, RouletteServices>();
+            services.AddSingleton<IRouletteServices, RouletteRedisServices>();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

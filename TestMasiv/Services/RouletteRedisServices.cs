@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using TestMasiv.Interface;
 namespace TestMasiv.Services
 {
-    public class RouletteServices : IRouletteServices
+    public class RouletteRedisServices : IRouletteServices
     {
     }
 }
