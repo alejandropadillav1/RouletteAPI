@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -41,6 +40,11 @@ namespace TestMasiv
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             });
             services.AddSingleton<IRouletteServices, RouletteRedisServices>();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("Redis");
+                options.InstanceName = "RedisMasivian_";
+            });
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

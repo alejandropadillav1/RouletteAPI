@@ -1,0 +1,18 @@
+version: '3.4'
+
+services:
+  redisdb:
+    container_name: "redisdb"
+    image: "redis:latest"
+    ports:
+       - "5002:6379"
+    tty:  true
+  testmasiv:
+    depends_on:
+       - "redisdb"
+    image: ${DOCKER_REGISTRY-}testmasiv
+    build:
+      context: .
+      dockerfile: TestMasiv/Dockerfile
+    ports:
+       - "5000:5000"
