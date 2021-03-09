@@ -27,6 +27,10 @@ namespace TestMasiv.Services
             {
                 throw new Exception("Roulette Not Found");
             }
+            if(!roulette.IsOpen)
+                throw new Exception("Roulette is not opened");
+            if(roulette.IsClosed)
+                throw new Exception("Roulete is closed");
             var betUser = roulette.ListUsers.FirstOrDefault(x => x.Id.Equals(IdUser));
             if(betUser == null)
             {
