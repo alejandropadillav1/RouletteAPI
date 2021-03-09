@@ -10,6 +10,6 @@ namespace TestMasiv.Models
         public bool IsClosed { get => ClosedAt != null ? true : false; }
         public DateTime? OpenAt { get; set; }
         public DateTime? ClosedAt { get; set; }
-        public List<BetUsers> ListUsers { get; set; }
+        public List<BetUsers> ListUsers { get; set; } = new List<BetUsers>();
     }
 }

@@ -41,5 +41,8 @@ namespace TestMasiv.Controller
                 yield return roulette;
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> BetRouletteAsync(int IdUser, string Id, Bet betRequest)
+        { return Ok(await _rouletteServices.BetRoulette(IdUser, Id, betRequest)); }
     }
 }

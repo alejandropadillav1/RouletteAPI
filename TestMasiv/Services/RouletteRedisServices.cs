@@ -20,8 +20,32 @@ namespace TestMasiv.Services
             RecordKey = string.Format("{0}-{1}", RecordKey, DateTime.UtcNow.ToString("yyyy-MM-ddThh:mm:ssZ"));
             listRoulette = new List<Roulette>();
         }
-        public Task<bool> BetRoulette(int IdUser, string idRoulette, Bet betRequest, CancellationTokenSource token = null)
-        { throw new NotImplementedException(); }
+        public async Task<bool> BetRoulette(int IdUser, string idRoulette, Bet betRequest, CancellationTokenSource token = null)
+        {
+            var roulette = listRoulette.FirstOrDefault(x => x.Id.Equals(idRoulette));
+            if(roulette == null)
+            {
+                throw new Exception("Roulette Not Found");
+            }
+            var betUser = roulette.ListUsers.FirstOrDefault(x => x.Id.Equals(IdUser));
+            if(betUser == null)
+            {
+                betUser = new BetUsers
+                {
+                    Id = IdUser,
+                };
+                roulette.ListUsers.Add(betUser);
+            }
+            var bet = new Bet
+            {
+                BetValue = betRequest.BetValue,
+                Position = betRequest.Position,
+                Color = betRequest.Color,
+            };
+            betUser.Bets.Add(bet);
+            await SaveChangesAsync(listRoulette);
+            return true;
+        }
         public async IAsyncEnumerable<BetUsers> CloseRoulette(string Id)
         {
             var roulette = listRoulette.FirstOrDefault(x => x.Id.Equals(Id));
