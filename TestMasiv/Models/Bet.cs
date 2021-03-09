@@ -9,6 +9,6 @@ namespace TestMasiv.Models
         public int Position { get; set; }
         public ColorEnum Color { get; set; }
         [Range(0.1d, maximum: 10000)]
-        public double BetValue { get; set; }
+        public double Money { get; set; }
     }
 }
