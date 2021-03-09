@@ -62,7 +62,7 @@ namespace TestMasiv.Services
                 if(!roulette.IsClosed)
                 {
                     roulette.ClosedAt = DateTime.Now;
-                    CalculatePrize(roulette);
+                    await CalculatePrize(roulette);
                     await SaveChangesAsync(listRoulette);
                     foreach(var betUser in roulette.ListUsers)
                     {
@@ -82,22 +82,26 @@ namespace TestMasiv.Services
                 throw new Exception("Roulette is not opened, please open first before close");
             }
         }
-        private void CalculatePrize(Roulette roulette)
+        private async Task CalculatePrize(Roulette roulette)
         {
             var winNumber = new Random().Next(0, 36);
             var winColor = winNumber % 2 == 0 ? ColorEnum.Red : ColorEnum.Black;
             foreach(var betUser in roulette.ListUsers)
             {
-                var sumPrize = 0d;
-                foreach(var bet in betUser.Bets)
-                {
-                    if(bet.Position == winNumber)
-                        sumPrize += bet.BetValue * 5;
-                    if(bet.Position == -1 && bet.Color == winColor)
-                        sumPrize += bet.BetValue * 1.8;
-                }
-                betUser.WinMoney = sumPrize;
+                betUser.WinMoney = await CalculateBetUserPrize(winNumber, winColor, betUser.Bets);
             }
+        }
+        private Task<double> CalculateBetUserPrize(int winNumber, ColorEnum winColor, List<Bet> Bets)
+        {
+            var sumPrize = 0d;
+            foreach(var bet in Bets)
+            {
+                if(bet.Position == winNumber)
+                    sumPrize += bet.BetValue * 5;
+                if(bet.Position == -1 && bet.Color == winColor)
+                    sumPrize += bet.BetValue * 1.8;
+            }
+            return Task.FromResult(sumPrize);
         }
         public async Task<string> CreateRoulette(CancellationTokenSource token = null)
         {
