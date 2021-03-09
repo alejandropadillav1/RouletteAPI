@@ -57,24 +57,21 @@ namespace TestMasiv.Services
             {
                 throw new Exception("Roulette Not Found");
             }
-            if(roulette.IsOpen)
+            if(roulette.IsOpen && !roulette.IsClosed)
             {
-                if(!roulette.IsClosed)
+                roulette.ClosedAt = DateTime.Now;
+                await CalculatePrize(roulette);
+                await SaveChangesAsync(listRoulette);
+                foreach(var betUser in roulette.ListUsers)
                 {
-                    roulette.ClosedAt = DateTime.Now;
-                    await CalculatePrize(roulette);
-                    await SaveChangesAsync(listRoulette);
-                    foreach(var betUser in roulette.ListUsers)
-                    {
-                        yield return betUser;
-                    }
+                    yield return betUser;
                 }
-                else
+            }
+            else if(!roulette.IsClosed)
+            {
+                foreach(var betUser in roulette.ListUsers)
                 {
-                    foreach(var betUser in roulette.ListUsers)
-                    {
-                        yield return betUser;
-                    }
+                    yield return betUser;
                 }
             }
             else
