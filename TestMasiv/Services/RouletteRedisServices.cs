@@ -42,7 +42,7 @@ namespace TestMasiv.Services
             }
             var bet = new Bet
             {
-                BetValue = betRequest.BetValue,
+                Money = betRequest.Money,
                 Position = betRequest.Position,
                 Color = betRequest.Color,
             };
@@ -97,9 +97,9 @@ namespace TestMasiv.Services
             foreach(var bet in Bets)
             {
                 if(bet.Position == winNumber)
-                    sumPrize += bet.BetValue * 5;
+                    sumPrize += bet.Money * 5;
                 if(bet.Position == -1 && bet.Color == winColor)
-                    sumPrize += bet.BetValue * 1.8;
+                    sumPrize += bet.Money * 1.8;
             }
             return Task.FromResult(sumPrize);
         }
